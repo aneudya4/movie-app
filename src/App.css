@@ -1,38 +1,102 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  color: white;
+  font-family: Oswald, sans-serif;
+}
 .App {
-  text-align: center;
+  height: 100vh;
+  box-shadow: inset 0 0 0 2000px rgba(0, 0, 0, 0.548);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.movie-details {
+  background: #000000c5;
+  min-width: 600px;
+  margin: 20px auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.poster {
+  width: 100%;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+.poster img {
+  width: 100%;
+}
+
+.movie-info {
+  padding: 25px 10px;
+  width: 100%;
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+.movie-info h1 {
+  font-size: 40px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.movie-info p {
+  line-height: 20px;
+}
+.genres {
+  margin: 20px 0;
+}
+
+.headlines {
+  color: #00fc87;
+  font-size: 25px;
+  margin: 20px 0;
+}
+
+.release-details {
+  display: flex;
+  width: 60%;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.release-info .headlines {
+  font-size: 25px;
+}
+
+.release-info p {
+  font-size: 16px;
+}
+
+@media all and (min-width: 700px) {
+  .movie-details {
+    display: flex;
+    flex-direction: row-reverse;
   }
-  to {
-    transform: rotate(360deg);
+
+  .poster {
+    width: 50%;
   }
+
+  .movie-details {
+    width: 50%;
+  }
+  .release-details {
+    width: 90%;
+  }
+}
+
+/* FORM  */
+form {
+  text-align: center;
+}
+
+input {
+  color: white;
+  margin-top: 20px;
+  background-color: transparent;
+  outline: none;
+  border: none;
+  font-size: 20px;
+  border-bottom: 1px solid white;
+  width: 300px;
+  padding-left: 5px;
+  padding-bottom: 5px;
+}
+
+input::placeholder {
+  color: rgb(177, 173, 173);
 }
