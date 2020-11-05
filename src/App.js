@@ -1,137 +1,136 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import TypeAhead from './TypeAhead';
 import './App.css';
-class App extends Component {
-  state = {
-    selected: null,
-    typeAhead: [],
-    input: '',
-    isLoading: true,
+const App = () => {
+  const [input, setInput] = useState('');
+  const [selectedMovie, setSelectedMovie] = useState([]);
+  const [typeAhead, setTypeAhead] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    fetchSingleMovie(299534);
+  }, []); // <-- Have to pass in [] here!
+
+  const onClick = (movie) => {
+    fetchSingleMovie(movie.id);
   };
 
-  componentDidMount() {
-    this.fetchSingleMovie(299534);
-  }
-
-  onClick = (movie) => {
-    this.fetchSingleMovie(movie.id);
-  };
-
-  fetchSingleMovie = (movieId) => {
-    this.setState({ isLoading: true });
+  const fetchSingleMovie = (movieId) => {
+    setIsLoading({ isLoading: true });
     fetch(
       `https://api.themoviedb.org/3/movie/${movieId}?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US`
     )
       .then((data) => {
         return data.json();
       })
-      .then((data) =>
-        this.setState({
-          selected: data,
-          input: '',
-          typeAhead: [],
-          isLoading: false,
-        })
-      );
+      .then((data) => {
+        setIsLoading(false);
+        setSelectedMovie(data);
+        setInput('');
+        setTypeAhead([]);
+      });
   };
 
-  onChange = (e) => {
-    this.setState({ input: e.target.value });
-    if (e.target.value === '') {
-      this.setState({ typeAhead: [] });
-    }
+  const onChange = (e) => {
+    setInput(e.target.value);
     if (e.target.value !== '') {
-      this.fetchMovies(e.target.value);
+      validateMovieSearch();
     }
   };
-  fetchMovies = (value) => {
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    fetchMovies(input);
+  };
+
+  const validateMovieSearch = () => {
+    if (input !== '') {
+      fetchMovies(input);
+    } else {
+      setTypeAhead([]);
+    }
+  };
+  const fetchMovies = (value) => {
     fetch(
       `https://api.themoviedb.org/3/search/movie?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US&query=${value}&page=1&include_adult=false`
     )
       .then((data) => {
         return data.json();
       })
-      .then((data) =>
-        this.setState({ typeAhead: data.results.filter((m, i) => i < 6) })
-      );
-  };
-
-  beautifyGenreList = (genreList) => {
-    let genresArr = [],
-      resultString;
-    if (genreList) {
-      genreList.forEach(function (genre) {
-        genresArr.push(genre.name);
+      .then((data) => {
+        setTypeAhead(data.results.filter((m, i) => i < 6));
+        setIsLoading(false);
       });
-    }
-    resultString = genresArr.join(', ');
-    return resultString;
   };
-  render() {
-    const { selected, isLoading } = this.state;
-    if (isLoading) {
-      return <div> Loading </div>;
-    }
-    return (
-      <div
-        className='App'
-        style={{
-          backgroundImage: `url(https://image.tmdb.org/t/p/original${selected.backdrop_path})`,
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'auto 100%;',
-          backgroundAttachment: 'fixed',
-        }}
-      >
-        <form>
-          <input
-            onChange={this.onChange}
-            type='text'
-            name='input'
-            placeholder='Search Movie Title...'
-            value={this.state.input}
-          />
-          <TypeAhead movies={this.state.typeAhead} onClick={this.onClick} />
-        </form>
-        <section className='movie-details'>
-          <div className='movie-info'>
-            <h1>{selected.original_title}</h1>
-            <p className='tagline headlines'>{selected.tagline}</p>
-            <p>{selected.overview}</p>
 
-            <div className='genres'>
-              <span className='headlines'>
-                {this.beautifyGenreList(selected.genres)}
-              </span>
-            </div>
-            <div className='release-details'>
-              <div className='release-info'>
-                <p>Original Release:</p>
-                <span className='headlines'>{selected.release_date}</span>
-              </div>
-              <div className='release-info'>
-                <p>Running Time:</p>
-                <span className='headlines'>{selected.runtime} mins</span>
-              </div>
-              <div className='release-info'>
-                <p>Box Office:</p>
-                <span className='headlines'>{selected.revenue}</span>
-              </div>
-              <div className='release-info'>
-                <p>vote Average:</p>
-                <span className='headlines'>{selected.vote_average}/10</span>
-              </div>
-            </div>
-          </div>
+  const beautifyGenreList = (genreList) => {
+    let genresArr = genreList ? genreList.map((genre) => genre.name) : [];
+    return genresArr.join(', ');
+  };
 
-          <div className='poster'>
-            <img
-              src={`https://image.tmdb.org/t/p/w500/${selected.poster_path}`}
-              alt={selected.title}
-            />
-          </div>
-        </section>
-      </div>
-    );
+  if (isLoading || selectedMovie.length === 0) {
+    return <div>MMG</div>;
   }
-}
+  return (
+    <div
+      className='App'
+      style={{
+        backgroundImage: `url(https://image.tmdb.org/t/p/original${selectedMovie.backdrop_path})`,
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'auto 100%',
+        backgroundAttachment: 'fixed',
+      }}
+    >
+      <form onSubmit={onSubmit}>
+        <input
+          onChange={onChange}
+          type='text'
+          name='input'
+          placeholder='Search Movie Title...'
+          value={input}
+        />
+        <TypeAhead movies={typeAhead} onClick={onClick} />
+      </form>
+      <section className='movie-details'>
+        <div className='movie-info'>
+          <h1>{selectedMovie.original_title}</h1>
+          <p className='tagline headlines'>{selectedMovie.tagline}</p>
+          <p>{selectedMovie.overview}</p>
+
+          <div className='genres'>
+            <span className='headlines'>
+              {beautifyGenreList(selectedMovie.genres)}
+            </span>
+          </div>
+          <div className='release-details'>
+            <div className='release-info'>
+              <p>Original Release:</p>
+              <span className='headlines'>{selectedMovie.release_date}</span>
+            </div>
+            <div className='release-info'>
+              <p>Running Time:</p>
+              <span className='headlines'>{selectedMovie.runtime} mins</span>
+            </div>
+            <div className='release-info'>
+              <p>Box Office:</p>
+              <span className='headlines'>{selectedMovie.revenue}</span>
+            </div>
+            <div className='release-info'>
+              <p>vote Average:</p>
+              <span className='headlines'>{selectedMovie.vote_average}/10</span>
+            </div>
+          </div>
+        </div>
+
+        <div className='poster'>
+          <img
+            src={`https://image.tmdb.org/t/p/w500/${selectedMovie.poster_path}`}
+            alt={selectedMovie.title}
+          />
+        </div>
+      </section>
+    </div>
+  );
+};
+
 export default App;
