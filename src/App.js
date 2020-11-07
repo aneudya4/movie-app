@@ -1,15 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import MovieHeader from './MovieHeader';
+import MovieDetails from './MovieDetails';
+import Poster from './Poster';
+import GenreList from './GenreList';
 import TypeAhead from './TypeAhead';
+import { key } from './config';
 import './App.css';
+
 const App = () => {
   const [input, setInput] = useState('');
   const [selectedMovie, setSelectedMovie] = useState([]);
-  const [typeAhead, setTypeAhead] = useState([]);
+  const [allMovies, setAllMovies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     fetchSingleMovie(299534);
-  }, []); // <-- Have to pass in [] here!
+    // id for movie Avengers:ENDGAME
+  }, []);
 
   const onClick = (movie) => {
     fetchSingleMovie(movie.id);
@@ -18,7 +25,7 @@ const App = () => {
   const fetchSingleMovie = (movieId) => {
     setIsLoading({ isLoading: true });
     fetch(
-      `https://api.themoviedb.org/3/movie/${movieId}?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US`
+      `https://api.themoviedb.org/3/movie/${movieId}?api_key=${key.api_key}&language=en-US`
     )
       .then((data) => {
         return data.json();
@@ -27,7 +34,19 @@ const App = () => {
         setIsLoading(false);
         setSelectedMovie(data);
         setInput('');
-        setTypeAhead([]);
+        setAllMovies([]);
+      });
+  };
+  const fetchMovies = (value) => {
+    fetch(
+      `https://api.themoviedb.org/3/search/movie?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US&query=${value}&page=1&include_adult=false`
+    )
+      .then((data) => {
+        return data.json();
+      })
+      .then((data) => {
+        setAllMovies(data.results.filter((m, i) => i < 6));
+        setIsLoading(false);
       });
   };
 
@@ -38,34 +57,12 @@ const App = () => {
     }
   };
 
-  const onSubmit = (e) => {
-    e.preventDefault();
-    fetchMovies(input);
-  };
-
   const validateMovieSearch = () => {
     if (input !== '') {
       fetchMovies(input);
     } else {
-      setTypeAhead([]);
+      setAllMovies([]);
     }
-  };
-  const fetchMovies = (value) => {
-    fetch(
-      `https://api.themoviedb.org/3/search/movie?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US&query=${value}&page=1&include_adult=false`
-    )
-      .then((data) => {
-        return data.json();
-      })
-      .then((data) => {
-        setTypeAhead(data.results.filter((m, i) => i < 6));
-        setIsLoading(false);
-      });
-  };
-
-  const beautifyGenreList = (genreList) => {
-    let genresArr = genreList ? genreList.map((genre) => genre.name) : [];
-    return genresArr.join(', ');
   };
 
   if (isLoading || selectedMovie.length === 0) {
@@ -77,57 +74,56 @@ const App = () => {
       style={{
         backgroundImage: `url(https://image.tmdb.org/t/p/original${selectedMovie.backdrop_path})`,
         backgroundRepeat: 'no-repeat',
-        backgroundSize: 'auto 100%',
+        backgroundSize: '100% 100%',
         backgroundAttachment: 'fixed',
       }}
     >
-      <form onSubmit={onSubmit}>
+      <form>
         <input
           onChange={onChange}
           type='text'
           name='input'
           placeholder='Search Movie Title...'
           value={input}
+          autoComplete='off'
         />
-        <TypeAhead movies={typeAhead} onClick={onClick} />
+        <TypeAhead movies={allMovies} onClick={onClick} />
       </form>
       <section className='movie-details'>
-        <div className='movie-info'>
-          <h1>{selectedMovie.original_title}</h1>
-          <p className='tagline headlines'>{selectedMovie.tagline}</p>
-          <p>{selectedMovie.overview}</p>
+        <MovieDetails className='movie-info'>
+          <MovieHeader
+            title={selectedMovie.title || 'Not Found'}
+            overview={selectedMovie.overview}
+            tagline={selectedMovie.tagline}
+          />
 
-          <div className='genres'>
-            <span className='headlines'>
-              {beautifyGenreList(selectedMovie.genres)}
-            </span>
-          </div>
+          <GenreList genreList={selectedMovie.genres} />
+
           <div className='release-details'>
-            <div className='release-info'>
+            <MovieDetails className={'release-info'}>
               <p>Original Release:</p>
               <span className='headlines'>{selectedMovie.release_date}</span>
-            </div>
-            <div className='release-info'>
+            </MovieDetails>
+
+            <MovieDetails className={'release-info'}>
               <p>Running Time:</p>
               <span className='headlines'>{selectedMovie.runtime} mins</span>
-            </div>
-            <div className='release-info'>
+            </MovieDetails>
+            <MovieDetails className={'release-info'}>
               <p>Box Office:</p>
               <span className='headlines'>{selectedMovie.revenue}</span>
-            </div>
-            <div className='release-info'>
+            </MovieDetails>
+            <MovieDetails className={'release-info'}>
               <p>vote Average:</p>
               <span className='headlines'>{selectedMovie.vote_average}/10</span>
-            </div>
+            </MovieDetails>
           </div>
-        </div>
+        </MovieDetails>
 
-        <div className='poster'>
-          <img
-            src={`https://image.tmdb.org/t/p/w500/${selectedMovie.poster_path}`}
-            alt={selectedMovie.title}
-          />
-        </div>
+        <Poster
+          poster={selectedMovie.poster_path}
+          title={selectedMovie.title}
+        />
       </section>
     </div>
   );
