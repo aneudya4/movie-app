@@ -4,6 +4,7 @@ import MovieDetails from './MovieDetails';
 import Poster from './Poster';
 import GenreList from './GenreList';
 import TypeAhead from './TypeAhead';
+import Spinner from './Spinner';
 import { key } from './config';
 import './App.css';
 
@@ -14,12 +15,15 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    fetchSingleMovie(299534);
-    // id for movie Avengers:ENDGAME
+    fetchSingleMovie(577922);
+    // id for movie TENET
   }, []);
 
   const onClick = (movie) => {
-    fetchSingleMovie(movie.id);
+    if (movie.id !== selectedMovie.id) {
+      fetchSingleMovie(movie.id);
+    }
+    setAllMovies([]);
   };
 
   const fetchSingleMovie = (movieId) => {
@@ -53,11 +57,11 @@ const App = () => {
   const onChange = (e) => {
     setInput(e.target.value);
     if (e.target.value !== '') {
-      validateMovieSearch();
+      validateMovieInput();
     }
   };
 
-  const validateMovieSearch = () => {
+  const validateMovieInput = () => {
     if (input !== '') {
       fetchMovies(input);
     } else {
@@ -66,7 +70,7 @@ const App = () => {
   };
 
   if (isLoading || selectedMovie.length === 0) {
-    return <div>MMG</div>;
+    return <Spinner />;
   }
   return (
     <div
