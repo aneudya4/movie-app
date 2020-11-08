@@ -69,7 +69,19 @@
   font-size: 16px;
 }
 
+.search-section {
+  text-align: center;
+  margin: 10px auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
 @media all and (min-width: 700px) {
+  .search-section {
+    flex-direction: row;
+    width: 700px;
+  }
   .App {
     height: 100vh;
   }
@@ -115,7 +127,7 @@ input {
   border: none;
   font-size: 20px;
   border-bottom: 1px solid white;
-  width: 300px;
+  width: 350px;
   padding-left: 5px;
   padding-bottom: 5px;
 }
@@ -126,18 +138,26 @@ input::placeholder {
 
 form ul {
   background-color: rgba(0, 0, 0, 0.562);
+  width: 350px;
   position: absolute;
-  width: 300px;
+  width: 350px;
   right: 50%;
   transform: translate(50%, 0%);
   margin: 0 auto;
+}
+
+.logo {
+  width: 100%;
+  align-self: center;
+  max-width: 140px;
+  margin-bottom: 25px;
+  display: block;
 }
 
 form ul li {
   list-style: none;
   color: white;
   text-align: left;
-  text-transform: lowercase;
   padding: 10px;
   border-bottom: 1px solid black;
 }

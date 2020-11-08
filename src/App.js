@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TMDBLogo from './images/tmdb.svg';
 import MovieHeader from './MovieHeader';
 import MovieDetails from './MovieDetails';
 import Poster from './Poster';
@@ -26,32 +27,32 @@ const App = () => {
     setAllMovies([]);
   };
 
-  const fetchSingleMovie = (movieId) => {
-    setIsLoading({ isLoading: true });
-    fetch(
-      `https://api.themoviedb.org/3/movie/${movieId}?api_key=${key.api_key}&language=en-US`
-    )
-      .then((data) => {
-        return data.json();
-      })
-      .then((data) => {
-        setIsLoading(false);
-        setSelectedMovie(data);
-        setInput('');
-        setAllMovies([]);
-      });
+  const fetchSingleMovie = async (movieId) => {
+    try {
+      setIsLoading(true);
+      const movie = await fetch(
+        `https://api.themoviedb.org/3/movie/${movieId}?api_key=${key.api_key}&language=en-US`
+      );
+      const movieJson = await movie.json();
+      setIsLoading(false);
+      setSelectedMovie(movieJson);
+      setInput('');
+      setAllMovies([]);
+    } catch (error) {
+      console.log(error);
+    }
   };
-  const fetchMovies = (value) => {
-    fetch(
-      `https://api.themoviedb.org/3/search/movie?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US&query=${value}&page=1&include_adult=false`
-    )
-      .then((data) => {
-        return data.json();
-      })
-      .then((data) => {
-        setAllMovies(data.results.filter((m, i) => i < 6));
-        setIsLoading(false);
-      });
+  const fetchMovies = async (movieName) => {
+    try {
+      const movies = await fetch(
+        `https://api.themoviedb.org/3/search/movie?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US&query=${movieName}&page=1&include_adult=false`
+      );
+      const moviesJson = await movies.json();
+      setAllMovies(moviesJson.results.filter((m, i) => i < 6));
+      setIsLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onChange = (e) => {
@@ -68,6 +69,13 @@ const App = () => {
       setAllMovies([]);
     }
   };
+  const onSubmit = async (e) => {
+    await e.preventDefault();
+    await fetchMovies(input);
+    await fetchSingleMovie(allMovies[0].id);
+    setInput('');
+    setAllMovies([]);
+  };
 
   if (isLoading || selectedMovie.length === 0) {
     return <Spinner />;
@@ -82,17 +90,21 @@ const App = () => {
         backgroundAttachment: 'fixed',
       }}
     >
-      <form>
-        <input
-          onChange={onChange}
-          type='text'
-          name='input'
-          placeholder='Search Movie Title...'
-          value={input}
-          autoComplete='off'
-        />
-        <TypeAhead movies={allMovies} onClick={onClick} />
-      </form>
+      <section className='search-section'>
+        <img src={TMDBLogo} className='logo' alt='The Movie Database' />
+
+        <form onSubmit={onSubmit}>
+          <input
+            onChange={onChange}
+            type='text'
+            name='input'
+            placeholder='Search Movie Title...'
+            value={input}
+            autoComplete='off'
+          />
+          <TypeAhead movies={allMovies} onClick={onClick} />
+        </form>
+      </section>
       <section className='movie-details'>
         <MovieDetails className='movie-info'>
           <MovieHeader
@@ -115,7 +127,11 @@ const App = () => {
             </MovieDetails>
             <MovieDetails className={'release-info'}>
               <p>Box Office:</p>
-              <span className='headlines'>{selectedMovie.revenue}</span>
+              <span className='headlines'>
+                {selectedMovie.revenue === 0
+                  ? 'Not Available'
+                  : selectedMovie.revenue}
+              </span>
             </MovieDetails>
             <MovieDetails className={'release-info'}>
               <p>vote Average:</p>
