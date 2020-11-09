@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ title, tagline, overview }) => {
+const MovieHeader = ({ title, tagline, overview }) => {
   return (
     <>
       <h1>{title}</h1>
@@ -9,3 +9,5 @@ export default ({ title, tagline, overview }) => {
     </>
   );
 };
+
+export default MovieHeader;

@@ -1,5 +1,7 @@
 import React from 'react';
 
-export default ({ children, className }) => {
+const MovieDetails = ({ children, className }) => {
   return <div className={className}>{children}</div>;
 };
+
+export default MovieDetails;

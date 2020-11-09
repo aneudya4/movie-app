@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default ({ genreList }) => {
+const GenreList = ({ genreList }) => {
   const beautifyGenreList = (genreList) => {
     let genresArr = genreList ? genreList.map((genre) => genre.name) : [];
     return genresArr.join(', ');
@@ -11,3 +11,5 @@ export default ({ genreList }) => {
     </div>
   );
 };
+
+export default GenreList;
