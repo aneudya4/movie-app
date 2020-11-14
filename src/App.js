@@ -7,6 +7,7 @@ import GenreList from './GenreList';
 import TypeAhead from './TypeAhead';
 import Spinner from './Spinner';
 import { key } from './config';
+import numeral from 'numeral';
 import './App.css';
 
 const App = () => {
@@ -48,7 +49,11 @@ const App = () => {
         `https://api.themoviedb.org/3/search/movie?api_key=d35dda56d61ee0678a341b8d5c804efc&language=en-US&query=${movieName}&page=1&include_adult=false`
       );
       const moviesJson = await movies.json();
-      setAllMovies(moviesJson.results.filter((m, i) => i < 6));
+      const predictedMovies = moviesJson.results.filter((movie) =>
+        movie.title.toLowerCase().includes(movieName.toLowerCase().trim())
+      );
+      console.log(predictedMovies);
+      setAllMovies(predictedMovies.filter((m, i) => i < 6));
       setIsLoading(false);
     } catch (error) {
       console.log(error);
@@ -58,17 +63,11 @@ const App = () => {
   const onChange = (e) => {
     setInput(e.target.value);
     if (e.target.value !== '') {
-      validateMovieInput();
+      fetchMovies(e.target.value);
     }
+    setAllMovies([]);
   };
 
-  const validateMovieInput = () => {
-    if (input !== '') {
-      fetchMovies(input);
-    } else {
-      setAllMovies([]);
-    }
-  };
   const onSubmit = async (e) => {
     await e.preventDefault();
     await fetchMovies(input);
@@ -130,7 +129,7 @@ const App = () => {
               <span className='headlines'>
                 {selectedMovie.revenue === 0
                   ? 'Not Available'
-                  : selectedMovie.revenue}
+                  : numeral(selectedMovie.revenue).format('($0,0)')}
               </span>
             </MovieDetails>
             <MovieDetails className={'release-info'}>
