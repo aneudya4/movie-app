@@ -52,7 +52,6 @@ const App = () => {
       const predictedMovies = moviesJson.results.filter((movie) =>
         movie.title.toLowerCase().includes(movieName.toLowerCase().trim())
       );
-      console.log(predictedMovies);
       setAllMovies(predictedMovies.filter((m, i) => i < 6));
       setIsLoading(false);
     } catch (error) {
