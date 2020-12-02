@@ -78,6 +78,7 @@ const App = () => {
   if (isLoading || selectedMovie.length === 0) {
     return <Spinner />;
   }
+
   return (
     <div
       className='App'
@@ -107,16 +108,18 @@ const App = () => {
         <MovieDetails className='movie-info'>
           <MovieHeader
             title={selectedMovie.title || 'Not Found'}
-            overview={selectedMovie.overview}
+            overview={selectedMovie.overview || 'Not Found'}
             tagline={selectedMovie.tagline}
           />
 
-          <GenreList genreList={selectedMovie.genres} />
+          <GenreList genreList={selectedMovie.genres || 'Not Found'} />
 
           <div className='release-details'>
             <MovieDetails className={'release-info'}>
               <p>Original Release:</p>
-              <span className='headlines'>{selectedMovie.release_date}</span>
+              <span className='headlines'>
+                {selectedMovie.release_date || '00/00/00'}
+              </span>
             </MovieDetails>
 
             <MovieDetails className={'release-info'}>
@@ -133,7 +136,9 @@ const App = () => {
             </MovieDetails>
             <MovieDetails className={'release-info'}>
               <p>vote Average:</p>
-              <span className='headlines'>{selectedMovie.vote_average}/10</span>
+              <span className='headlines'>
+                {selectedMovie.vote_average || 0}/10
+              </span>
             </MovieDetails>
           </div>
         </MovieDetails>
