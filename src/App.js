@@ -93,14 +93,16 @@ const App = () => {
         <img src={TMDBLogo} className='logo' alt='The Movie Database' />
 
         <form onSubmit={onSubmit}>
-          <input
-            onChange={onChange}
-            type='text'
-            name='input'
-            placeholder='Search Movie Title...'
-            value={input}
-            autoComplete='off'
-          />
+          <label>
+            <input
+              onChange={onChange}
+              type='text'
+              name='input'
+              placeholder='Search Movie Title...'
+              value={input}
+              autoComplete='off'
+            />
+          </label>
           <TypeAhead movies={allMovies} onClick={onClick} />
         </form>
       </section>
